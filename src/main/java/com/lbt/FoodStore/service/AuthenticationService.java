@@ -4,6 +4,7 @@ import com.lbt.FoodStore.dto.request.authen.AuthenticationRequest;
 import com.lbt.FoodStore.dto.request.authen.IntrospectRequest;
 import com.lbt.FoodStore.dto.response.authen.AuthenticationResponse;
 import com.lbt.FoodStore.dto.response.authen.IntrospectResponse;
+import com.lbt.FoodStore.entity.RoleEntity;
 import com.lbt.FoodStore.entity.UserEntity;
 import com.lbt.FoodStore.enums.ErrorCode;
 import com.lbt.FoodStore.excep.AppException;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -61,7 +63,7 @@ public class AuthenticationService {
     }
 
     public IntrospectResponse introspect(IntrospectRequest request)
-            throws JOSEException , ParseException{
+            throws JOSEException, ParseException {
         String token = request.getToken();
 
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
@@ -105,9 +107,12 @@ public class AuthenticationService {
 
     private String buildScope(UserEntity user) {
         StringJoiner joiner = new StringJoiner(" ");
-//        if (!CollectionUtils.isEmpty(user.getRoles())) {
-//            user.getRoles().forEach(joiner::add);
-//        }
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(role -> {
+                joiner.add("ROLE_" + role.getName());
+                role.getPermissions().forEach(permission -> joiner.add(permission.getName()));
+            });
+        }
         return joiner.toString();
     }
 }
