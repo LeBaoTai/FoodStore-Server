@@ -33,6 +33,9 @@ public class SecurityConfig {
             // authenticate
             "/auth/log-in",
             "/auth/introspect",
+
+            // logout
+            "/auth/logout"
     };
 
     @Value("${jwt.key}")
