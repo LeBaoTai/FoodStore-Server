@@ -1,0 +1,25 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: FoodStore
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/foodstore
+    username: postgres
+    password: foodstorepassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+jwt:
+  key: "Ndq0nV6wslreZuvaL/sS/UzE5Ka9yEOQ7Og8c0m9Si3ylMn2xql5mMIhtnlzow9Nnk90MMcGs4lYIIHk2Za0tW/aAdnKmLwk4U+Ph3D22uU="
