@@ -31,6 +31,8 @@ public class AppInit {
             if (repository.findByUsername("admin").isEmpty()) {
                 Set<RoleEntity> roles = new HashSet<>();
                 UserEntity user = UserEntity.builder()
+                        .firstname("ADMIN")
+                        .lastname("ADMIN")
                         .username("admin")
                         .password(passwordEncoder.encode("password@123"))
 //                        .roles(roles)
