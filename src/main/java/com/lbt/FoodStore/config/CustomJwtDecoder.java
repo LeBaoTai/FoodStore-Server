@@ -3,8 +3,11 @@ package com.lbt.FoodStore.config;
 import com.lbt.FoodStore.dto.request.authen.IntrospectRequest;
 import com.lbt.FoodStore.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -17,14 +20,16 @@ import java.text.ParseException;
 import java.util.Objects;
 
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+    @Value("${jwt.key}")
+    String signerKey;
 
     @Autowired
-    private AuthenticationService authenticationService;
+    @Lazy
+    AuthenticationService authenticationService;
 
-    private NimbusJwtDecoder nimbusJwtDecoder = null;
+    NimbusJwtDecoder nimbusJwtDecoder = null;
 
     @Override
     public Jwt decode(String token) throws JwtException {
@@ -47,4 +52,5 @@ public class CustomJwtDecoder implements JwtDecoder {
 
         return nimbusJwtDecoder.decode(token);
     }
+
 }
