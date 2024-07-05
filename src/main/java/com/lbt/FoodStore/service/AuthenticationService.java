@@ -3,6 +3,7 @@ package com.lbt.FoodStore.service;
 import com.lbt.FoodStore.dto.request.authen.AuthenticationRequest;
 import com.lbt.FoodStore.dto.request.authen.IntrospectRequest;
 import com.lbt.FoodStore.dto.request.authen.LogoutRequest;
+import com.lbt.FoodStore.dto.request.authen.RefreshTokenRequest;
 import com.lbt.FoodStore.dto.response.authen.AuthenticationResponse;
 import com.lbt.FoodStore.dto.response.authen.IntrospectResponse;
 import com.lbt.FoodStore.entity.InvalidatedTokenEntity;
@@ -51,6 +52,15 @@ public class AuthenticationService {
     @Value("${jwt.key}")
     String SIGNER_KEY;
 
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    long REFRESHABLE_DURATION;
+
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         UserEntity foundUser = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -76,7 +86,7 @@ public class AuthenticationService {
         boolean isValid = true;
 
         try {
-            verifyToken(token);
+            verifyToken(token, false);
         } catch (AppException e) {
             isValid = false;
         }
@@ -85,8 +95,33 @@ public class AuthenticationService {
                 .build();
     }
 
+    public AuthenticationResponse refresh(RefreshTokenRequest request) throws ParseException, JOSEException {
+        SignedJWT signJwt = verifyToken(request.getToken(), true);
+
+        String jit = signJwt.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signJwt.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedTokenEntity tokenExpired = InvalidatedTokenEntity.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(tokenExpired);
+
+        String username = signJwt.getJWTClaimsSet().getSubject();
+
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        String newToken = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .isAuthentication(true)
+                .token(newToken)
+                .build();
+    }
+
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
-        var signToken = verifyToken(request.getToken());
+        SignedJWT signToken = verifyToken(request.getToken(), false);
 
         String jit = signToken.getJWTClaimsSet().getJWTID();
         Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
@@ -99,13 +134,16 @@ public class AuthenticationService {
         invalidatedTokenRepository.save(token);
     }
 
-    private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
+    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
 
 
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expireTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date expireTime = isRefresh
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
+                .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         boolean verified = signedJWT.verify(verifier);
 
@@ -128,7 +166,7 @@ public class AuthenticationService {
                 .issuer("lbt.com")
                 .issueTime(new Date())
                 .expirationTime(
-                        new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli())
+                        new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli())
                 )
                 .jwtID(UUID.randomUUID().toString())
                 .claim("claim", "custom")

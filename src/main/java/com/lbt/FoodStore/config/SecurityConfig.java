@@ -30,9 +30,8 @@ public class SecurityConfig {
             // authenticate
             "/auth/log-in",
             "/auth/introspect",
-
-            // logout
-            "/auth/logout"
+            "/auth/logout",
+            "/auth/refresh"
     };
 
     @Autowired

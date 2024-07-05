@@ -3,6 +3,7 @@ package com.lbt.FoodStore.controller;
 import com.lbt.FoodStore.dto.request.authen.AuthenticationRequest;
 import com.lbt.FoodStore.dto.request.authen.IntrospectRequest;
 import com.lbt.FoodStore.dto.request.authen.LogoutRequest;
+import com.lbt.FoodStore.dto.request.authen.RefreshTokenRequest;
 import com.lbt.FoodStore.dto.response.ApiResponse;
 import com.lbt.FoodStore.dto.response.authen.AuthenticationResponse;
 import com.lbt.FoodStore.dto.response.authen.IntrospectResponse;
@@ -49,6 +50,15 @@ public class AuthenticationController {
         service.logout(request);
         return ApiResponse.<Void>builder()
 
+                .build();
+    }
+
+
+    @PostMapping("/refresh")
+    public ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshTokenRequest request)
+            throws ParseException, JOSEException {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(service.refresh(request))
                 .build();
     }
 
