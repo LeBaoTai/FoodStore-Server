@@ -20,6 +20,7 @@ import java.util.List;
 @RequestMapping("/products")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Builder
+@CrossOrigin()
 public class ProductController {
     @Autowired
     ProductService service;
