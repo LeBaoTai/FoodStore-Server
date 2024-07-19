@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -63,7 +64,7 @@ public class UserService {
     }
 
     @PostAuthorize("returnObject.username == authentication.name")
-    public UserResponse getUser(String id) {
+    public UserResponse getUser(UUID id) {
         log.info("In method get one user");
         UserEntity foundUser = repository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -78,7 +79,7 @@ public class UserService {
         return mapper.toResponse(foundUser);
     }
 
-    public UserResponse updateUser(String id, UserUpdateRequest request) {
+    public UserResponse updateUser(UUID id, UserUpdateRequest request) {
         UserEntity foundUser = repository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -92,7 +93,7 @@ public class UserService {
         return mapper.toResponse(repository.save(foundUser));
     }
 
-    public void deleteUser(String id) {
+    public void deleteUser(UUID id) {
         repository.deleteById(id);
     }
 }
