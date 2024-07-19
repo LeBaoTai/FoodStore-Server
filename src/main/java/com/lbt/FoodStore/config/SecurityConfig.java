@@ -34,13 +34,22 @@ public class SecurityConfig {
             "/auth/refresh"
     };
 
+    final String[] publicGetRequestPath = {
+            "/products/all",
+            "/products/all/name/**",
+            "/products/all/type/**",
+            "/products/**",
+    };
+
     @Autowired
     CustomJwtDecoder jwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> {
-            request.requestMatchers(HttpMethod.POST, publicPostRequestPath).permitAll().anyRequest().authenticated();
+            request.requestMatchers(HttpMethod.POST, publicPostRequestPath).permitAll()
+                    .requestMatchers(HttpMethod.GET, publicGetRequestPath).permitAll()
+                    .anyRequest().authenticated();
         });
 
         http.oauth2ResourceServer(oauth2 ->
