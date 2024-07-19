@@ -34,7 +34,7 @@ public class AppInit {
                         .firstname("ADMIN")
                         .lastname("ADMIN")
                         .username("admin")
-                        .password(passwordEncoder.encode("password@123"))
+                        .password(passwordEncoder.encode("admin@admin"))
 //                        .roles(roles)
                         .build();
 

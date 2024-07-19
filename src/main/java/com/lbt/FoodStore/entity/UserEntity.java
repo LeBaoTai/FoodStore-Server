@@ -6,8 +6,10 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
+@Table(name = "users")
 @Data
 @Builder
 @FieldDefaults(level=AccessLevel.PRIVATE)
@@ -16,13 +18,20 @@ import java.util.Set;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    UUID id;
     String username;
     String password;
     String firstname;
     String lastname;
+    String phone;
+    String email;
     LocalDate dob;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_name")
+    )
     Set<RoleEntity> roles;
 }
