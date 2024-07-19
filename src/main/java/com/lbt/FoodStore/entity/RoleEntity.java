@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.Set;
 
 @Entity
+@Table(name = "roles")
 @Data
 @Builder
 @FieldDefaults(level= AccessLevel.PRIVATE)

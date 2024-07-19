@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "products")
 @Data
 @Builder
 @FieldDefaults(level= AccessLevel.PRIVATE)
