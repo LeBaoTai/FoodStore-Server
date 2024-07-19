@@ -13,12 +13,17 @@ spring:
     password: foodstorepassword
     driver-class-name: org.postgresql.Driver
 
+#  sql:
+#    init:
+#      mode: always
+
   jpa:
+#    defer-datasource-initialization: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: create
+#    hibernate:
+#      ddl-auto: create
     show-sql: true
 
 jwt:
