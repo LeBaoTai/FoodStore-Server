@@ -8,9 +8,9 @@ spring:
     name: FoodStore
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/foodstore
-    username: postgres
-    password: foodstorepassword
+    url: jdbc:postgresql://ep-mute-cherry-a1ucqkwm.ap-southeast-1.aws.neon.tech/foodstore?user=foodstore&password=jQbMJ7mKzGC4&sslmode=require
+    username: foodstore
+    password: jQbMJ7mKzGC4
     driver-class-name: org.postgresql.Driver
 
 #  sql:
